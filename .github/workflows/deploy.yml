@@ -22,6 +22,13 @@ jobs:
 
       - uses: cloudflare/wrangler-action@v3
         with:
-          command: pages deploy dist --project-name=tudasproba
+          command: pages project create tudasproba --production-branch=main
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        continue-on-error: true
+
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          command: pages deploy dist --project-name=tudasproba --commit-dirty=true
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
