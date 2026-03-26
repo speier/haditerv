@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import { generateQuizQuestions } from '../data/questions'
+import { generateQuizQuestions, loadMissed, saveMissed } from '../data/questions'
 import { loadResults, saveResult, BADGES, findNewBadges } from '../data/badges'
+
+function speak(text) {
+  window.speechSynthesis.cancel()
+  const utterance = new SpeechSynthesisUtterance(text)
+  utterance.lang = 'hu-HU'
+  utterance.rate = 0.9
+  window.speechSynthesis.speak(utterance)
+}
 
 function loadProgress(key) {
   try {
@@ -55,12 +63,12 @@ export default function Quiz({ deck, onBack }) {
 
   const [state, setState] = useState(() => {
     const saved = loadProgress(STORAGE_KEY)
-    if (saved && !saved.finished && saved.questions?.[0]?.label) {
+    if (saved && !saved.finished && saved.questions?.[0]?.label && (saved.current > 0 || saved.selected !== null)) {
       return { ...saved, answerAnim: null }
     }
     clearProgress(STORAGE_KEY)
     const questions = generateQuizQuestions(deck)
-    return { questions, current: 0, selected: null, score: 0, finished: false, streak: 0, answerAnim: null }
+    return { questions, current: 0, selected: null, score: 0, finished: false, streak: 0, answerAnim: null, wrongIds: [] }
   })
   const [newBadges, setNewBadges] = useState([])
   const [showConfetti, setShowConfetti] = useState(false)
@@ -94,6 +102,7 @@ export default function Quiz({ deck, onBack }) {
       score: correct ? s.score + 1 : s.score,
       streak: correct ? (s.streak || 0) + 1 : 0,
       answerAnim: correct ? 'correct' : 'wrong',
+      wrongIds: correct ? (s.wrongIds || []) : [...(s.wrongIds || []), q.itemId],
     }))
   }
 
@@ -108,6 +117,14 @@ export default function Quiz({ deck, onBack }) {
   const handleNext = () => {
     setState((s) => {
       if (s.current + 1 >= total) {
+        // Save missed questions for next quiz
+        const missed = s.questions.filter((qq, i) => s.wrongIds && s.wrongIds.includes(qq.itemId))
+        const prevMissed = loadMissed(deck.id)
+        // Keep items still missed, remove items answered correctly this round
+        const correctIds = s.questions.filter((qq) => !s.wrongIds?.includes(qq.itemId)).map((qq) => qq.itemId)
+        const updatedMissed = [...new Set([...prevMissed, ...(s.wrongIds || [])])].filter((id) => !correctIds.includes(id))
+        saveMissed(deck.id, updatedMissed)
+
         const oldBadges = loadResults().badges || []
         const earned = saveResult(s.score, total)
         const freshBadges = findNewBadges(oldBadges, earned.badges)
@@ -124,7 +141,7 @@ export default function Quiz({ deck, onBack }) {
   const handleRestart = () => {
     clearProgress(STORAGE_KEY)
     const questions = generateQuizQuestions(deck)
-    const fresh = { questions, current: 0, selected: null, score: 0, finished: false, streak: 0, answerAnim: null }
+    const fresh = { questions, current: 0, selected: null, score: 0, finished: false, streak: 0, answerAnim: null, wrongIds: [] }
     setNewBadges([])
     setShowConfetti(false)
     setEarnedXp(0)
@@ -243,7 +260,17 @@ export default function Quiz({ deck, onBack }) {
             ? `${deck.categories[q.category].icon} ${deck.categories[q.category].label}`
             : '❓ Kérdés'}
         </p>
-        <p className="text-2xl font-bold">{q.label}</p>
+        <div className="flex items-start gap-2">
+          <p className="flex-1 text-2xl font-bold">{q.label}</p>
+          <button
+            onClick={() => speak(q.label)}
+            className="mt-1 shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+            aria-label="Kérdés felolvasása"
+            title="Felolvasás"
+          >
+            🔊
+          </button>
+        </div>
       </div>
 
       {/* Options */}
