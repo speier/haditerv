@@ -74,6 +74,7 @@ export default function Quiz({ deck, onBack }) {
   const [showConfetti, setShowConfetti] = useState(false)
   const [earnedXp, setEarnedXp] = useState(0)
   const questionRef = useRef(null)
+  const timerRef = useRef(null)
 
   const { questions, current, selected, score, finished, streak = 0, answerAnim } = state
   const q = questions[current]
@@ -110,11 +111,16 @@ export default function Quiz({ deck, onBack }) {
   useEffect(() => {
     if (selected === null) return
     const delay = selected === q.correctAnswer ? 1200 : 2500
-    const timer = setTimeout(handleNext, delay)
-    return () => clearTimeout(timer)
+    timerRef.current = setTimeout(handleNext, delay)
+    return () => clearTimeout(timerRef.current)
   }, [selected])
 
   const handleNext = () => {
+    // Clear pending auto-advance timer to prevent double-fire
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
     setState((s) => {
       if (s.current + 1 >= total) {
         // Save missed questions for next quiz
@@ -230,7 +236,8 @@ export default function Quiz({ deck, onBack }) {
         <div className="flex items-center gap-2">
           <button
             onClick={onBack}
-            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+            disabled={selected !== null}
+            className={`rounded-lg p-1.5 transition-colors ${selected !== null ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300'}`}
             aria-label="Vissza"
           >
             ←
@@ -252,6 +259,9 @@ export default function Quiz({ deck, onBack }) {
       <p className="text-center text-sm text-slate-500 dark:text-slate-400">
         Kérdés {current + 1} / {total} &nbsp;·&nbsp; ✅ {score} pont
       </p>
+
+      {/* Question + options – dim during answer review */}
+      <div className={`flex flex-col gap-6 transition-opacity duration-300 ${selected !== null ? 'opacity-50 pointer-events-none' : ''}`}>
 
       {/* Question card – school notebook style */}
       <div className="animate-slide-up rounded-xl bg-white p-5 shadow-md dark:bg-slate-800">
@@ -304,6 +314,8 @@ export default function Quiz({ deck, onBack }) {
           )
         })}
       </div>
+
+      </div>{/* end dimmed wrapper */}
 
       {/* Explanation + countdown */}
       {selected !== null && (
