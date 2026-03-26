@@ -1,0 +1,162 @@
+import { useState, useEffect } from 'react'
+import { loadResults, getRank, getNextRank, ACHIEVEMENTS, generateShareText } from '../data/badges'
+
+export default function Results() {
+  const [data, setData] = useState(loadResults)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    setData(loadResults())
+  }, [])
+
+  const rank = getRank(data.best || 0)
+  const nextRank = getNextRank(data.best || 0)
+  const allBadges = ACHIEVEMENTS.map((a) => ({
+    ...a,
+    earned: (data.badges || []).includes(a.id),
+  }))
+
+  const currentPct = data.best || 0
+  const nextMinPct = nextRank?.minPct || 100
+  const prevMinPct = rank.minPct
+  const progressToNext = nextRank
+    ? Math.min(100, ((currentPct - prevMinPct) / (nextMinPct - prevMinPct)) * 100)
+    : 100
+
+  const handleShare = async () => {
+    const text = generateShareText(data)
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Haditerv Eredmény', text })
+        return
+      }
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      try {
+        await navigator.clipboard.writeText(text)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      } catch {}
+    }
+  }
+
+  const handleReset = () => {
+    localStorage.removeItem('quizResults')
+    setData({ last: null, best: null, attempts: 0, streak: 0, bestStreak: 0, badges: [], history: [], xp: 0, dailyStreak: 0, bestDailyStreak: 0 })
+  }
+
+  const history = data.history || []
+  const maxPct = Math.max(...history.map((h) => h.pct), 1)
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Rank card */}
+      <div className="animate-slide-up flex flex-col items-center gap-2 rounded-2xl bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 p-6 shadow-md dark:from-amber-900/20 dark:via-yellow-900/20 dark:to-orange-900/20">
+        <div className="text-5xl">{rank.icon}</div>
+        <p className="text-2xl font-extrabold">{rank.name}</p>
+        {nextRank && (
+          <div className="mt-1 w-full">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-white/60 dark:bg-slate-700/60">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 transition-all duration-700"
+                style={{ width: `${progressToNext}%` }}
+              />
+            </div>
+            <p className="mt-1 text-center text-xs text-slate-400">
+              {nextRank.icon} {nextRank.name} – még {nextMinPct - currentPct}%
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 gap-3">
+        <StatCard icon="⚡" label="Összesen XP" value={data.xp || 0} color="bg-blue-50 dark:bg-blue-900/30" />
+        <StatCard icon="🏆" label="Legjobb" value={data.best !== null ? `${data.best}%` : '–'} color="bg-amber-50 dark:bg-amber-900/30" />
+        <StatCard icon="📅" label="Napi sorozat" value={`${data.dailyStreak || 0} nap`} color="bg-orange-50 dark:bg-orange-900/30" />
+        <StatCard icon="🔢" label="Kitöltések" value={data.attempts || 0} color="bg-emerald-50 dark:bg-emerald-900/30" />
+        <StatCard icon="📝" label="Legutóbbi" value={data.last !== null ? `${data.last}%` : '–'} color="bg-slate-50 dark:bg-slate-800" />
+        <StatCard icon="🔥" label="Legjobb sorozat" value={data.bestStreak || 0} color="bg-red-50 dark:bg-red-900/30" />
+      </div>
+
+      {/* Progress chart */}
+      {history.length > 1 && (
+        <div className="rounded-2xl bg-white p-4 shadow-md dark:bg-slate-800">
+          <p className="mb-3 text-sm font-semibold text-slate-500 dark:text-slate-400">📈 Fejlődés</p>
+          <div className="flex items-end gap-1" style={{ height: 80 }}>
+            {history.map((h, i) => (
+              <div
+                key={i}
+                className="flex-1 rounded-t bg-gradient-to-t from-emerald-500 to-emerald-300 transition-all dark:from-emerald-600 dark:to-emerald-400"
+                style={{ height: `${(h.pct / maxPct) * 100}%`, minHeight: 4 }}
+                title={`${h.date}: ${h.pct}%`}
+              />
+            ))}
+          </div>
+          <div className="mt-1 flex justify-between text-xs text-slate-400">
+            <span>{history[0]?.date}</span>
+            <span>{history[history.length - 1]?.date}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Badges */}
+      <div className="rounded-2xl bg-white p-4 shadow-md dark:bg-slate-800">
+        <p className="mb-3 text-sm font-semibold text-slate-500 dark:text-slate-400">
+          🎖️ Kitüntetések ({allBadges.filter((b) => b.earned).length}/{allBadges.length})
+        </p>
+        <div className="grid grid-cols-4 gap-3">
+          {allBadges.map((b) => (
+            <div
+              key={b.id}
+              className={`flex flex-col items-center gap-1 rounded-xl p-2 text-center transition-all ${
+                b.earned
+                  ? ''
+                  : 'opacity-25 grayscale'
+              }`}
+              title={b.desc}
+            >
+              <span className="text-2xl">{b.icon}</span>
+              <span className="text-[10px] font-medium leading-tight">{b.name}</span>
+              <span className="text-[9px] text-slate-400">{b.desc}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Share button */}
+      {data.attempts > 0 && (
+        <button
+          onClick={handleShare}
+          className="w-full rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-lg font-semibold text-white shadow-md transition-transform hover:scale-[1.02] active:scale-[0.98]"
+        >
+          {copied ? '✅ Másolva!' : '📋 Eredmény megosztása'}
+        </button>
+      )}
+
+      {/* Reset */}
+      {data.attempts > 0 && (
+        <button
+          onClick={handleReset}
+          className="rounded-lg px-4 py-2 text-sm text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+        >
+          Eredmények törlése
+        </button>
+      )}
+    </div>
+  )
+}
+
+function StatCard({ icon, label, value, color }) {
+  return (
+    <div className={`${color} flex items-center gap-3 rounded-xl p-3.5 shadow-sm`}>
+      <span className="text-xl">{icon}</span>
+      <div>
+        <p className="text-[10px] text-slate-500 dark:text-slate-400">{label}</p>
+        <p className="text-lg font-bold">{value}</p>
+      </div>
+    </div>
+  )
+}
