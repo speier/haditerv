@@ -2,7 +2,7 @@ export const people = [
   {
     id: 'p1',
     name: 'Winston Churchill',
-    description: 'Angol miniszterelnök a háború alatt',
+    description: 'Brit miniszterelnök a háború alatt',
   },
   {
     id: 'p2',
@@ -12,12 +12,12 @@ export const people = [
   {
     id: 'p3',
     name: 'Harry S. Truman',
-    description: 'Amerikai elnök a háború végén, az atombomba bevetése',
+    description: 'Amerikai elnök a háború végén, az atombomba bevetésekor',
   },
   {
     id: 'p4',
     name: 'Szálasi Ferenc',
-    description: 'Magyar nyilas párt vezetője',
+    description: 'A magyar nyilas párt vezetője',
   },
   {
     id: 'p5',
@@ -59,13 +59,13 @@ export const dates = [
   {
     id: 'd5',
     date: '1941.12.07.',
-    event: 'Pearl Harbor, japán támadás Amerika ellen',
+    event: 'Pearl Harbor: japán támadás az Egyesült Államok ellen',
     sortKey: 19411207,
   },
   {
     id: 'd6',
     date: '1944.03.19.',
-    event: 'Németek megszállják Magyarországot',
+    event: 'A németek megszállják Magyarországot',
     sortKey: 19440319,
   },
   {
@@ -77,7 +77,7 @@ export const dates = [
   {
     id: 'd8',
     date: '1944.10.15.',
-    event: 'Horthy kiálltványa',
+    event: 'Horthy kiáltványa',
     sortKey: 19441015,
   },
   {
@@ -119,7 +119,7 @@ export const concepts = [
   {
     id: 'c4',
     name: 'Jaltai konferencia',
-    description: 'Németország 4 megszállási övezetre bontása',
+    description: 'Németország négy megszállási övezetre bontása',
   },
   {
     id: 'c5',
@@ -149,32 +149,32 @@ export const concepts = [
   {
     id: 'c10',
     name: '1. zsidó törvény',
-    description: 'Bizonyos szakmákban csak 20% lehet zsidó',
+    description: 'Bizonyos szakmákban legfeljebb 20% lehetett zsidó',
   },
   {
     id: 'c11',
     name: '2. zsidó törvény',
-    description: 'Bizonyos szakmákban csak 6% lehet zsidó',
+    description: 'Bizonyos szakmákban legfeljebb 6% lehetett zsidó',
   },
   {
     id: 'c12',
     name: '3. zsidó törvény',
-    description: 'Megtiltják a zsidó és nem zsidó közti házasságot',
+    description: 'Megtiltották a zsidók és nem zsidók közötti házasságot',
   },
   {
     id: 'c13',
     name: 'Nürnbergi per',
-    description: 'A háborús bűnösöket megbüntették',
+    description: 'A háborús bűnösök felelősségre vonása',
   },
   {
     id: 'c14',
     name: '1. bécsi döntés',
-    description: 'MO visszakapja a Felvidéket és Kárpátalját',
+    description: 'Magyarország visszakapja a Felvidéket és Kárpátalját',
   },
   {
     id: 'c15',
     name: '2. bécsi döntés',
-    description: 'MO visszakapja Erdélyt és Székelyföldet',
+    description: 'Magyarország visszakapja Erdélyt és Székelyföldet',
   },
 ]
 

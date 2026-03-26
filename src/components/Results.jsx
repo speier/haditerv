@@ -27,7 +27,7 @@ export default function Results() {
     const text = generateShareText(data)
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Haditerv Eredmény', text })
+        await navigator.share({ title: 'Haditerv eredmény', text })
         return
       }
       await navigator.clipboard.writeText(text)
@@ -73,7 +73,7 @@ export default function Results() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">
-        <StatCard icon="⚡" label="Összesen XP" value={data.xp || 0} color="bg-blue-50 dark:bg-blue-900/30" />
+        <StatCard icon="⚡" label="Összes XP" value={data.xp || 0} color="bg-blue-50 dark:bg-blue-900/30" />
         <StatCard icon="🏆" label="Legjobb" value={data.best !== null ? `${data.best}%` : '–'} color="bg-amber-50 dark:bg-amber-900/30" />
         <StatCard icon="📅" label="Napi sorozat" value={`${data.dailyStreak || 0} nap`} color="bg-orange-50 dark:bg-orange-900/30" />
         <StatCard icon="🔢" label="Kitöltések" value={data.attempts || 0} color="bg-emerald-50 dark:bg-emerald-900/30" />
@@ -132,7 +132,7 @@ export default function Results() {
           onClick={handleShare}
           className="w-full rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-lg font-semibold text-white shadow-md transition-transform hover:scale-[1.02] active:scale-[0.98]"
         >
-          {copied ? '✅ Másolva!' : '📋 Eredmény megosztása'}
+          {copied ? '✅ Másolva!' : '📋 Eredmények megosztása'}
         </button>
       )}
 

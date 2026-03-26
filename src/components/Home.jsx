@@ -41,18 +41,18 @@ export default function Home({ navigate }) {
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight">Haditerv</h1>
           <p className="mt-2 text-base text-slate-500 dark:text-slate-400">
-            II. Világháború kvíz gyakorló
+            II. világháborús kvíz
           </p>
         </div>
 
         <div className="w-full space-y-3 rounded-2xl bg-white p-5 shadow-md dark:bg-slate-800">
           <div className="flex items-center gap-3">
             <span className="text-2xl">📚</span>
-            <p className="text-sm"><strong>10 kérdés</strong> nevekből és dátumokból</p>
+            <p className="text-sm"><strong>10 kérdés</strong> nevekről, dátumokról és fogalmakról</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">⚡</span>
-            <p className="text-sm">Gyűjts <strong>XP pontokat</strong> és emelkedj rangban</p>
+            <p className="text-sm">Gyűjts <strong>XP-t</strong>, és lépj előre a ranglétrán</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔥</span>
@@ -82,7 +82,7 @@ export default function Home({ navigate }) {
           ⚔️ Haditerv
         </p>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          II. Világháború kvíz
+          II. világháborús kvíz
         </p>
       </div>
 
@@ -143,7 +143,7 @@ export default function Home({ navigate }) {
             />
           </div>
           <p className="mt-1 text-center text-xs text-slate-400">
-            Még {nextMinPct - currentPct}% kell a következő ranghoz
+            Még {nextMinPct - currentPct}% hiányzik a következő ranghoz
           </p>
         </div>
       )}

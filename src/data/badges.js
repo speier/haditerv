@@ -22,9 +22,9 @@ export const ACHIEVEMENTS = [
   { id: 'ten',       name: 'Hadvezér',         icon: '⚔️', desc: '10 kvíz kitöltése',             check: (d) => d.attempts >= 10 },
   { id: 'perfect',   name: 'Tökéletes!',       icon: '💎', desc: '100%-os eredmény',              check: (d) => d.best >= 100 },
   { id: 'great',     name: 'Kiváló tanuló',    icon: '🌟', desc: '80% feletti legjobb eredmény',  check: (d) => d.best >= 80 },
-  { id: 'streak3',   name: 'Lángész',          icon: '🔥', desc: '3 egymást követő 80%+ kvíz',   check: (d) => d.bestStreak >= 3 },
-  { id: 'streak5',   name: 'Megállíthatatlan',  icon: '💪', desc: '5 egymást követő 80%+ kvíz',   check: (d) => d.bestStreak >= 5 },
-  { id: 'improve',   name: 'Fejlődő',          icon: '📈', desc: 'Javítottad a legjobb eredményed', check: (d) => d.improved },
+  { id: 'streak3',   name: 'Lángész',          icon: '🔥', desc: '3 egymást követő, legalább 80%-os kvíz', check: (d) => d.bestStreak >= 3 },
+  { id: 'streak5',   name: 'Megállíthatatlan', icon: '💪', desc: '5 egymást követő, legalább 80%-os kvíz', check: (d) => d.bestStreak >= 5 },
+  { id: 'improve',   name: 'Fejlődő',          icon: '📈', desc: 'Javítottad a legjobb eredményedet', check: (d) => d.improved },
   { id: 'daily3',    name: 'Kitartó',          icon: '📅', desc: '3 napos sorozat',               check: (d) => d.dailyStreak >= 3 },
   { id: 'daily7',    name: 'Megszállott',      icon: '🗓️', desc: '7 napos sorozat',               check: (d) => d.dailyStreak >= 7 },
   { id: 'xp100',     name: 'Század',           icon: '💯', desc: '100 XP összegyűjtése',          check: (d) => d.xp >= 100 },
@@ -133,7 +133,7 @@ export function generateShareText(data) {
     .join(' ')
 
   return [
-    `⚔️ HADITERV – II. Világháború Kvíz`,
+    `⚔️ HADITERV – II. világháborús kvíz`,
     ``,
     `${rank.icon} Rang: ${rank.name}`,
     `🏆 Legjobb: ${data.best ?? 0}%`,
