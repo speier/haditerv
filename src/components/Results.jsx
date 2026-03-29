@@ -183,12 +183,13 @@ export default function Results() {
 
       {/* About */}
       <div className="mt-4 border-t border-slate-200/60 pt-4 text-center dark:border-slate-700/40">
-        <p className="text-[11px] text-slate-400 dark:text-slate-500">
-          Készítette{' '}
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center justify-center gap-1">
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
           <a href="https://dendora.hu" target="_blank" rel="noopener noreferrer" className="font-medium text-emerald-500 hover:underline dark:text-emerald-400">
             dendora.hu
           </a>
         </p>
+        <p className="mt-0.5 text-[10px] text-slate-300 dark:text-slate-600">{__GIT_REV__}</p>
       </div>
     </div>
   )

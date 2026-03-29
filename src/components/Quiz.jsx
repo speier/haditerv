@@ -67,7 +67,7 @@ export default function Quiz({ deck, onBack }) {
       return { ...saved, answerAnim: null }
     }
     clearProgress(STORAGE_KEY)
-    const questions = generateQuizQuestions(deck)
+    const questions = generateQuizQuestions(deck, deck.items.length)
     return { questions, current: 0, selected: null, score: 0, finished: false, streak: 0, answerAnim: null, wrongIds: [] }
   })
   const [newBadges, setNewBadges] = useState([])
@@ -89,6 +89,23 @@ export default function Quiz({ deck, onBack }) {
   useEffect(() => {
     questionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [current])
+
+  // Dev mode: arrow keys to cycle through questions
+  const isDev = import.meta.env.DEV
+  useEffect(() => {
+    if (!isDev || finished) return
+    const handleKey = (e) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        setState((s) => ({ ...s, current: (s.current + 1) % total, selected: null, answerAnim: null }))
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        setState((s) => ({ ...s, current: (s.current - 1 + total) % total, selected: null, answerAnim: null }))
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [isDev, finished, total])
 
   const handleSelect = (option) => {
     if (selected !== null) return
@@ -146,7 +163,7 @@ export default function Quiz({ deck, onBack }) {
 
   const handleRestart = () => {
     clearProgress(STORAGE_KEY)
-    const questions = generateQuizQuestions(deck)
+    const questions = generateQuizQuestions(deck, deck.items.length)
     const fresh = { questions, current: 0, selected: null, score: 0, finished: false, streak: 0, answerAnim: null, wrongIds: [] }
     setNewBadges([])
     setShowConfetti(false)
@@ -270,6 +287,16 @@ export default function Quiz({ deck, onBack }) {
             ? `${deck.categories[q.category].icon} ${deck.categories[q.category].label}`
             : '❓ Kérdés'}
         </p>
+        {q.image && (
+          <div className="mb-3 flex justify-center">
+            <img
+              src={q.image}
+              alt=""
+              className="max-h-48 rounded-lg object-contain shadow-sm"
+              draggable={false}
+            />
+          </div>
+        )}
         <div className="flex items-start gap-2">
           <p className="flex-1 text-2xl font-bold">{q.label}</p>
           <button
@@ -317,46 +344,43 @@ export default function Quiz({ deck, onBack }) {
 
       </div>{/* end dimmed wrapper */}
 
-      {/* Explanation + countdown */}
+      {/* Feedback overlay */}
       {selected !== null && (
-        <div className="flex flex-col gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={handleNext}>
           <div
-            className={`animate-slide-up rounded-xl p-4 text-sm ${
+            className={`animate-slide-up w-full max-w-md rounded-2xl p-6 shadow-xl ${
               selected === q.correctAnswer
-                ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200'
-                : 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+                ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200'
+                : 'bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-200'
             }`}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <p className="font-semibold">
+              <p className="text-lg font-semibold">
                 {selected === q.correctAnswer ? '✅ Helyes!' : '❌ Helytelen!'}
               </p>
               {selected === q.correctAnswer && (
                 <span className="animate-float-up text-sm font-bold text-emerald-600 dark:text-emerald-400">+10 XP ⚡</span>
               )}
             </div>
-            <p className="mt-1">{q.explanation}</p>
-          </div>
-          {/* Countdown bar */}
-          <div className="h-1 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-            <div
-              className={`countdown-bar h-full rounded-full ${
-                selected === q.correctAnswer ? 'bg-emerald-400' : 'bg-red-400'
-              }`}
-              style={{ animationDuration: selected === q.correctAnswer ? '1.2s' : '2.5s' }}
-            />
+            <p className="mt-2 text-sm">{q.explanation}</p>
+            {/* Countdown bar */}
+            <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-white/50 dark:bg-black/20">
+              <div
+                className={`countdown-bar h-full rounded-full ${
+                  selected === q.correctAnswer ? 'bg-emerald-400' : 'bg-red-400'
+                }`}
+                style={{ animationDuration: selected === q.correctAnswer ? '1.2s' : '2.5s' }}
+              />
+            </div>
+            <button
+              onClick={handleNext}
+              className="mt-3 w-full py-2 text-center text-sm opacity-70 transition-opacity hover:opacity-100"
+            >
+              Koppints a továbblépéshez →
+            </button>
           </div>
         </div>
-      )}
-
-      {/* Tap to skip wait */}
-      {selected !== null && (
-        <button
-          onClick={handleNext}
-          className="animate-slide-up py-2 text-center text-sm text-slate-400 transition-colors hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
-        >
-          Koppints a továbblépéshez →
-        </button>
       )}
     </div>
   )

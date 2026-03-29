@@ -38,6 +38,7 @@ export function generateQuizQuestions(deck, count = 10) {
       itemId: item.id,
       category: item.category || null,
       label: item.prompt,
+      image: item.image || null,
       correctAnswer: item.answer,
       explanation: `${item.prompt} – ${item.answer}.`,
       pool: sameCategory.map((o) => o.answer),
@@ -45,10 +46,33 @@ export function generateQuizQuestions(deck, count = 10) {
     }
   })
 
-  // Prioritize missed questions, then fill with the rest
-  const missed = shuffle(questions.filter((q) => missedIds.includes(q.itemId)))
-  const rest = shuffle(questions.filter((q) => !missedIds.includes(q.itemId)))
-  const selected = [...missed, ...rest].slice(0, actualCount)
+  // Group questions by category to ensure proportional representation
+  const byCategory = {}
+  for (const q of questions) {
+    const cat = q.category || '_none'
+    if (!byCategory[cat]) byCategory[cat] = []
+    byCategory[cat].push(q)
+  }
+  const categories = Object.keys(byCategory)
+
+  // Shuffle each category, prioritizing missed questions within each
+  for (const cat of categories) {
+    const catMissed = byCategory[cat].filter((q) => missedIds.includes(q.itemId))
+    const catRest = byCategory[cat].filter((q) => !missedIds.includes(q.itemId))
+    byCategory[cat] = [...shuffle(catMissed), ...shuffle(catRest)]
+  }
+
+  // Pick at least 1 from each category, then fill remaining slots proportionally
+  const selected = []
+  const remaining = []
+  for (const cat of categories) {
+    selected.push(byCategory[cat][0])
+    remaining.push(...byCategory[cat].slice(1))
+  }
+  const slotsLeft = actualCount - selected.length
+  if (slotsLeft > 0) {
+    selected.push(...shuffle(remaining).slice(0, slotsLeft))
+  }
 
   return shuffle(selected).map((q) => {
     const wrongFromCategory = q.pool.filter((a) => a !== q.correctAnswer)
@@ -64,6 +88,7 @@ export function generateQuizQuestions(deck, count = 10) {
       itemId: q.itemId,
       category: q.category,
       label: q.label,
+      image: q.image,
       options: shuffle([q.correctAnswer, ...wrongPicks]),
       correctAnswer: q.correctAnswer,
       explanation: q.explanation,

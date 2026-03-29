@@ -10,6 +10,8 @@ export default {
     person:  { label: 'Személy',  icon: '👤' },
     date:    { label: 'Dátum',    icon: '📅' },
     concept: { label: 'Fogalom',  icon: '📖' },
+    image:   { label: 'Képfelismerés', icon: '🖼️' },
+    map:     { label: 'Térkép',   icon: '🗺️' },
   },
   items: [
     // People
@@ -19,6 +21,22 @@ export default {
     { id: 'p4', prompt: 'Szálasi Ferenc',         answer: 'A magyar nyilas párt vezetője',                                   category: 'person'  },
     { id: 'p5', prompt: 'Teleki Pál',             answer: 'Magyar miniszterelnök a háború előtt',                            category: 'person'  },
     { id: 'p6', prompt: 'Sztójay Döme',           answer: 'Magyar miniszterelnök a német megszállás idején',                 category: 'person'  },
+
+    // Image recognition – identify the person from a photo
+    { id: 'i1', prompt: 'Ki látható a képen?', answer: 'Winston Churchill',      image: '/images/ww2/churchill.jpg',  category: 'image' },
+    { id: 'i2', prompt: 'Ki látható a képen?', answer: 'Franklin D. Roosevelt',  image: '/images/ww2/roosevelt.jpg',  category: 'image' },
+    { id: 'i3', prompt: 'Ki látható a képen?', answer: 'Harry S. Truman',        image: '/images/ww2/truman.jpg',     category: 'image' },
+    { id: 'i4', prompt: 'Ki látható a képen?', answer: 'Szálasi Ferenc',         image: '/images/ww2/szalasi.jpg',    category: 'image' },
+    { id: 'i5', prompt: 'Ki látható a képen?', answer: 'Teleki Pál',             image: '/images/ww2/teleki.jpg',     category: 'image' },
+    { id: 'i6', prompt: 'Ki látható a képen?', answer: 'Sztójay Döme',           image: '/images/ww2/sztojay.jpg',    category: 'image' },
+
+    // Map – WW2 military events (map shown as reference)
+    { id: 'm1', prompt: 'Melyik országot rohanta le Németország 1939. szeptember 1-jén?',         answer: 'Lengyelország',                             image: '/images/ww2/terkep.jpg', category: 'map' },
+    { id: 'm2', prompt: 'Melyik másik nagyhatalom rohanta le Lengyelországot keletről?',           answer: 'A Szovjetunió',                             image: '/images/ww2/terkep.jpg', category: 'map' },
+    { id: 'm3', prompt: 'Melyik három kis országot rohanták le a BENELUX lerohanásakor?',          answer: 'Belgium, Hollandia és Luxemburg',           image: '/images/ww2/terkep.jpg', category: 'map' },
+    { id: 'm4', prompt: 'Melyik két skandináv országot támadta meg Németország 1940-ben?',        answer: 'Dánia és Norvégia',                         image: '/images/ww2/terkep.jpg', category: 'map' },
+    { id: 'm5', prompt: 'Melyik nagy nyugat-európai országot támadta meg Németország 1940-ben?',  answer: 'Franciaország',                             image: '/images/ww2/terkep.jpg', category: 'map' },
+    { id: 'm6', prompt: 'Mi a neve a Brit-szigetek elleni német légi hadjáratnak?',                answer: 'Angliai csata',                             image: '/images/ww2/terkep.jpg', category: 'map' },
 
     // Dates
     { id: 'd1',  prompt: '1938.11.02.',   answer: 'I. bécsi döntés',                                            category: 'date' },
